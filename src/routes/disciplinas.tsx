@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { AppShell } from "@/components/AppShell";
 import { Button } from "@/components/ui/button";
@@ -65,28 +65,39 @@ function SubjectsPage() {
         {hydrated && subjects.length === 0 && (
           <p className="text-muted-foreground col-span-full">Nenhuma disciplina ainda.</p>
         )}
-        {subjects.map((s) => (
-          <div key={s.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm relative overflow-hidden">
-            <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: s.color }} />
-            <div className="flex items-start justify-between gap-2">
-              <div>
-                <h4 className="font-display text-xl">{s.name}</h4>
-                {s.goalHours ? (
-                  <p className="text-sm text-muted-foreground mt-1">Meta: {s.goalHours}h / semana</p>
-                ) : (
-                  <p className="text-sm text-muted-foreground mt-1">Sem meta definida</p>
-                )}
+        {subjects.map((s) => {
+          const total = s.topics?.length ?? 0;
+          const done = s.topics?.filter((t) => t.done).length ?? 0;
+          return (
+            <div key={s.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm relative overflow-hidden group">
+              <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: s.color }} />
+              <div className="flex items-start justify-between gap-2">
+                <Link
+                  to="/disciplinas/$id"
+                  params={{ id: s.id }}
+                  className="flex-1 min-w-0"
+                >
+                  <h4 className="font-display text-xl hover:underline underline-offset-4">{s.name}</h4>
+                  {s.goalHours ? (
+                    <p className="text-sm text-muted-foreground mt-1">Meta: {s.goalHours}h / semana</p>
+                  ) : (
+                    <p className="text-sm text-muted-foreground mt-1">Sem meta definida</p>
+                  )}
+                  <p className="text-xs text-muted-foreground mt-2">
+                    {total === 0 ? "Sem conteúdos cadastrados" : `${done}/${total} conteúdos concluídos`}
+                  </p>
+                </Link>
+                <button
+                  onClick={() => studyActions.removeSubject(s.id)}
+                  className="text-muted-foreground hover:text-destructive p-1.5 rounded-md hover:bg-muted"
+                  aria-label="Remover"
+                >
+                  <Trash2 className="size-4" />
+                </button>
               </div>
-              <button
-                onClick={() => studyActions.removeSubject(s.id)}
-                className="text-muted-foreground hover:text-destructive p-1.5 rounded-md hover:bg-muted"
-                aria-label="Remover"
-              >
-                <Trash2 className="size-4" />
-              </button>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </AppShell>
   );
