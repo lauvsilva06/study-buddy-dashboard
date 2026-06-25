@@ -1,11 +1,19 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+export type Topic = {
+  id: string;
+  title: string;
+  notes?: string;
+  done: boolean;
+};
+
 export type Subject = {
   id: string;
   name: string;
   color: string;
   description?: string;
   goalHours?: number;
+  topics?: Topic[];
 };
 
 export type ScheduleBlock = {
