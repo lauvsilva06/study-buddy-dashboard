@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useStudyStore, useHydrated, studyActions } from "@/lib/study-store";
 import { Trash2, Plus } from "lucide-react";
 
-export const Route = createFileRoute("/disciplinas")({
+export const Route = createFileRoute("/disciplinas/")({
   head: () => ({ meta: [{ title: "Disciplinas" }, { name: "description", content: "Gerencie suas disciplinas." }] }),
   component: SubjectsPage,
 });
