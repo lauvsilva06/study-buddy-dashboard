@@ -1,11 +1,19 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+export type Topic = {
+  id: string;
+  title: string;
+  notes?: string;
+  done: boolean;
+};
+
 export type Subject = {
   id: string;
   name: string;
   color: string;
   description?: string;
   goalHours?: number;
+  topics?: Topic[];
 };
 
 export type ScheduleBlock = {
@@ -107,6 +115,43 @@ export const studyActions = {
   },
   addSession(session: Omit<StudySession, "id">) {
     setState((s) => ({ ...s, sessions: [...s.sessions, { ...session, id: crypto.randomUUID() }] }));
+  },
+  addTopic(subjectId: string, topic: Omit<Topic, "id" | "done">) {
+    const t: Topic = { ...topic, id: crypto.randomUUID(), done: false };
+    setState((s) => ({
+      ...s,
+      subjects: s.subjects.map((x) =>
+        x.id === subjectId ? { ...x, topics: [...(x.topics ?? []), t] } : x,
+      ),
+    }));
+  },
+  updateTopic(subjectId: string, topicId: string, patch: Partial<Topic>) {
+    setState((s) => ({
+      ...s,
+      subjects: s.subjects.map((x) =>
+        x.id === subjectId
+          ? { ...x, topics: (x.topics ?? []).map((t) => (t.id === topicId ? { ...t, ...patch } : t)) }
+          : x,
+      ),
+    }));
+  },
+  toggleTopic(subjectId: string, topicId: string) {
+    setState((s) => ({
+      ...s,
+      subjects: s.subjects.map((x) =>
+        x.id === subjectId
+          ? { ...x, topics: (x.topics ?? []).map((t) => (t.id === topicId ? { ...t, done: !t.done } : t)) }
+          : x,
+      ),
+    }));
+  },
+  removeTopic(subjectId: string, topicId: string) {
+    setState((s) => ({
+      ...s,
+      subjects: s.subjects.map((x) =>
+        x.id === subjectId ? { ...x, topics: (x.topics ?? []).filter((t) => t.id !== topicId) } : x,
+      ),
+    }));
   },
 };
 
