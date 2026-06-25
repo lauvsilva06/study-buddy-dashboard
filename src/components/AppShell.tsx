@@ -1,7 +1,9 @@
-import { Link, useRouterState } from "@tanstack/react-router";
-import { BookOpen, CalendarDays, Timer, LayoutDashboard } from "lucide-react";
-import type { ReactNode } from "react";
+import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
+import { BookOpen, CalendarDays, Timer, LayoutDashboard, LogOut } from "lucide-react";
+import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/lib/supabase";
+import { initStudyStore, useStudyStore } from "@/lib/study-store";
 
 const nav = [
   { to: "/", label: "Visão geral", icon: LayoutDashboard },
@@ -12,6 +14,49 @@ const nav = [
 
 export function AppShell({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+  const loaded = useStudyStore((s) => s.loaded);
+  const userId = useStudyStore((s) => s.userId);
+  const [checked, setChecked] = useState(false);
+  const [email, setEmail] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    initStudyStore().then(() => {
+      if (cancelled) return;
+      setChecked(true);
+    });
+    supabase.auth.getUser().then(({ data }) => {
+      if (!cancelled) setEmail(data.user?.email ?? null);
+    });
+    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
+      setEmail(session?.user?.email ?? null);
+    });
+    return () => {
+      cancelled = true;
+      sub.subscription.unsubscribe();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (checked && loaded && !userId) {
+      navigate({ to: "/auth" });
+    }
+  }, [checked, loaded, userId, navigate]);
+
+  async function signOut() {
+    await supabase.auth.signOut();
+    navigate({ to: "/auth" });
+  }
+
+  if (!checked || !loaded) {
+    return (
+      <div className="min-h-screen grid place-items-center bg-background text-muted-foreground text-sm">
+        Carregando...
+      </div>
+    );
+  }
+  if (!userId) return null;
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -27,7 +72,7 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
         </Link>
         <nav className="mt-4 flex flex-col gap-1">
           {nav.map((item) => {
-            const active = pathname === item.to;
+            const active = pathname === item.to || (item.to !== "/" && pathname.startsWith(item.to));
             const Icon = item.icon;
             return (
               <Link
@@ -46,10 +91,18 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
             );
           })}
         </nav>
+        <div className="mt-auto pt-4 border-t border-sidebar-border">
+          {email && <div className="px-2 pb-2 text-xs text-muted-foreground truncate">{email}</div>}
+          <button
+            onClick={signOut}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-sm text-sidebar-foreground/80 hover:bg-sidebar-accent/50"
+          >
+            <LogOut className="size-4" /> Sair
+          </button>
+        </div>
       </aside>
 
       <main className="flex-1 min-w-0">
-        {/* Mobile nav */}
         <div className="md:hidden flex items-center gap-1 overflow-x-auto border-b border-border bg-sidebar px-3 py-2">
           {nav.map((item) => {
             const active = pathname === item.to;
@@ -68,6 +121,9 @@ export function AppShell({ title, subtitle, children }: { title: string; subtitl
               </Link>
             );
           })}
+          <button onClick={signOut} className="ml-auto flex items-center gap-1 text-xs text-muted-foreground px-2">
+            <LogOut className="size-3.5" />
+          </button>
         </div>
 
         <div className="px-6 md:px-10 py-8 md:py-12 max-w-6xl mx-auto">
