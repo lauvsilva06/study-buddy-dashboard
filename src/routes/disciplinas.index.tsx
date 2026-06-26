@@ -89,6 +89,15 @@ function SubjectsPage() {
                   ) : (
                     <p className="text-sm text-muted-foreground mt-1">Sem meta definida</p>
                   )}
+                  {s.deadline && (() => {
+                    const d = new Date(s.deadline + "T00:00:00");
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const days = Math.round((d.getTime() - today.getTime()) / 86400000);
+                    const formatted = d.toLocaleDateString("pt-BR");
+                    const label = days < 0 ? `Vencido há ${Math.abs(days)}d` : days === 0 ? "Vence hoje" : `Faltam ${days}d`;
+                    const tone = days < 0 ? "text-destructive" : days <= 7 ? "text-primary" : "text-muted-foreground";
+                    return <p className={`text-sm mt-1 ${tone}`}>Prazo: {formatted} · {label}</p>;
+                  })()}
                   <p className="text-xs text-muted-foreground mt-2">
                     {total === 0 ? "Sem conteúdos cadastrados" : `${done}/${total} conteúdos concluídos`}
                   </p>
