@@ -13,6 +13,7 @@ export type Subject = {
   name: string;
   color: string;
   goalHours?: number;
+  deadline?: string; // YYYY-MM-DD
   topics?: Topic[];
 };
 
