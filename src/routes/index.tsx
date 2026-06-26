@@ -83,7 +83,8 @@ function Dashboard() {
 
 function StatCard({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+    <div className="rounded-2xl border border-border bg-card p-5 shadow-sm relative overflow-hidden">
+      <div className="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-primary to-primary-glow" />
       <div className="flex items-center justify-between text-muted-foreground">
         <span className="text-sm">{label}</span>
         {icon}
