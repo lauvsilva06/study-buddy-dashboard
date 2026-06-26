@@ -20,20 +20,22 @@ function SubjectsPage() {
   const [name, setName] = useState("");
   const [color, setColor] = useState(PALETTE[0]);
   const [goal, setGoal] = useState("");
+  const [deadline, setDeadline] = useState("");
 
   function add(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    studyActions.addSubject({ name: name.trim(), color, goalHours: goal ? Number(goal) : undefined });
+    studyActions.addSubject({ name: name.trim(), color, goalHours: goal ? Number(goal) : undefined, deadline: deadline || undefined });
     setName("");
     setGoal("");
+    setDeadline("");
   }
 
   return (
     <AppShell title="Disciplinas" subtitle="O que você precisa estudar.">
       <form onSubmit={add} className="rounded-2xl border border-border bg-card p-5 shadow-sm mb-8">
         <h3 className="font-display text-lg mb-4">Adicionar disciplina</h3>
-        <div className="grid md:grid-cols-[1fr_140px_auto] gap-3 items-end">
+        <div className="grid md:grid-cols-[1fr_140px_180px_auto] gap-3 items-end">
           <div>
             <Label htmlFor="name">Nome</Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Cálculo I" className="mt-1.5" />
@@ -41,6 +43,10 @@ function SubjectsPage() {
           <div>
             <Label htmlFor="goal">Meta (h/sem)</Label>
             <Input id="goal" type="number" min="0" value={goal} onChange={(e) => setGoal(e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label htmlFor="deadline">Prazo final</Label>
+            <Input id="deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="mt-1.5" />
           </div>
           <Button type="submit" className="md:w-auto"><Plus className="size-4 mr-1" /> Adicionar</Button>
         </div>
@@ -83,6 +89,15 @@ function SubjectsPage() {
                   ) : (
                     <p className="text-sm text-muted-foreground mt-1">Sem meta definida</p>
                   )}
+                  {s.deadline && (() => {
+                    const d = new Date(s.deadline + "T00:00:00");
+                    const today = new Date(); today.setHours(0,0,0,0);
+                    const days = Math.round((d.getTime() - today.getTime()) / 86400000);
+                    const formatted = d.toLocaleDateString("pt-BR");
+                    const label = days < 0 ? `Vencido há ${Math.abs(days)}d` : days === 0 ? "Vence hoje" : `Faltam ${days}d`;
+                    const tone = days < 0 ? "text-destructive" : days <= 7 ? "text-primary" : "text-muted-foreground";
+                    return <p className={`text-sm mt-1 ${tone}`}>Prazo: {formatted} · {label}</p>;
+                  })()}
                   <p className="text-xs text-muted-foreground mt-2">
                     {total === 0 ? "Sem conteúdos cadastrados" : `${done}/${total} conteúdos concluídos`}
                   </p>

@@ -13,6 +13,7 @@ export type Subject = {
   name: string;
   color: string;
   goalHours?: number;
+  deadline?: string; // YYYY-MM-DD
   topics?: Topic[];
 };
 
@@ -100,6 +101,7 @@ async function loadAll(userId: string) {
     name: s.name,
     color: s.color,
     goalHours: s.weekly_hours_target ?? undefined,
+    deadline: s.deadline ?? undefined,
     topics: topics
       .filter((t) => t.subject_id === s.id)
       .map((t) => ({ id: t.id, title: t.title, notes: t.notes ?? undefined, done: !!t.done })),
@@ -172,13 +174,14 @@ export const studyActions = {
         name: subject.name,
         color: subject.color,
         weekly_hours_target: subject.goalHours ?? null,
+        deadline: subject.deadline ?? null,
       })
       .select()
       .single();
     if (error || !data) return;
     setState((s) => ({
       ...s,
-      subjects: [...s.subjects, { id: data.id, name: data.name, color: data.color, goalHours: data.weekly_hours_target ?? undefined, topics: [] }],
+      subjects: [...s.subjects, { id: data.id, name: data.name, color: data.color, goalHours: data.weekly_hours_target ?? undefined, deadline: data.deadline ?? undefined, topics: [] }],
     }));
   },
 
@@ -187,6 +190,7 @@ export const studyActions = {
     if (patch.name !== undefined) dbPatch.name = patch.name;
     if (patch.color !== undefined) dbPatch.color = patch.color;
     if (patch.goalHours !== undefined) dbPatch.weekly_hours_target = patch.goalHours;
+    if (patch.deadline !== undefined) dbPatch.deadline = patch.deadline ?? null;
     await supabase.from("subjects").update(dbPatch).eq("id", id);
     setState((s) => ({
       ...s,

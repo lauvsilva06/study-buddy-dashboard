@@ -52,8 +52,29 @@ function SubjectDetailPage() {
         </div>
       </div>
 
-      <div className="h-2 w-full rounded-full bg-muted overflow-hidden mb-8">
+      <div className="h-2 w-full rounded-full bg-muted overflow-hidden mb-6">
         <div className="h-full transition-all" style={{ width: `${progress}%`, background: subject.color }} />
+      </div>
+
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm mb-8 flex flex-wrap items-end gap-4">
+        <div className="flex-1 min-w-[200px]">
+          <Label htmlFor="deadline">Prazo final da disciplina</Label>
+          <Input
+            id="deadline"
+            type="date"
+            value={subject.deadline ?? ""}
+            onChange={(e) => studyActions.updateSubject(subject.id, { deadline: e.target.value || undefined })}
+            className="mt-1.5"
+          />
+        </div>
+        {subject.deadline && (() => {
+          const d = new Date(subject.deadline + "T00:00:00");
+          const today = new Date(); today.setHours(0,0,0,0);
+          const days = Math.round((d.getTime() - today.getTime()) / 86400000);
+          const label = days < 0 ? `Vencido há ${Math.abs(days)} dia(s)` : days === 0 ? "Vence hoje" : `Faltam ${days} dia(s)`;
+          const tone = days < 0 ? "text-destructive" : days <= 7 ? "text-primary" : "text-muted-foreground";
+          return <p className={`text-sm ${tone}`}>{d.toLocaleDateString("pt-BR")} · {label}</p>;
+        })()}
       </div>
 
       <form onSubmit={add} className="rounded-2xl border border-border bg-card p-5 shadow-sm mb-8">
