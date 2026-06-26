@@ -20,13 +20,15 @@ function SubjectsPage() {
   const [name, setName] = useState("");
   const [color, setColor] = useState(PALETTE[0]);
   const [goal, setGoal] = useState("");
+  const [deadline, setDeadline] = useState("");
 
   function add(e: React.FormEvent) {
     e.preventDefault();
     if (!name.trim()) return;
-    studyActions.addSubject({ name: name.trim(), color, goalHours: goal ? Number(goal) : undefined });
+    studyActions.addSubject({ name: name.trim(), color, goalHours: goal ? Number(goal) : undefined, deadline: deadline || undefined });
     setName("");
     setGoal("");
+    setDeadline("");
   }
 
   return (
