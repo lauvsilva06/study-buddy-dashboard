@@ -101,6 +101,7 @@ async function loadAll(userId: string) {
     name: s.name,
     color: s.color,
     goalHours: s.weekly_hours_target ?? undefined,
+    deadline: s.deadline ?? undefined,
     topics: topics
       .filter((t) => t.subject_id === s.id)
       .map((t) => ({ id: t.id, title: t.title, notes: t.notes ?? undefined, done: !!t.done })),
