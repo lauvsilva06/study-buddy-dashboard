@@ -35,7 +35,7 @@ function SubjectsPage() {
     <AppShell title="Disciplinas" subtitle="O que você precisa estudar.">
       <form onSubmit={add} className="rounded-2xl border border-border bg-card p-5 shadow-sm mb-8">
         <h3 className="font-display text-lg mb-4">Adicionar disciplina</h3>
-        <div className="grid md:grid-cols-[1fr_140px_auto] gap-3 items-end">
+        <div className="grid md:grid-cols-[1fr_140px_180px_auto] gap-3 items-end">
           <div>
             <Label htmlFor="name">Nome</Label>
             <Input id="name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Ex: Cálculo I" className="mt-1.5" />
@@ -43,6 +43,10 @@ function SubjectsPage() {
           <div>
             <Label htmlFor="goal">Meta (h/sem)</Label>
             <Input id="goal" type="number" min="0" value={goal} onChange={(e) => setGoal(e.target.value)} className="mt-1.5" />
+          </div>
+          <div>
+            <Label htmlFor="deadline">Prazo final</Label>
+            <Input id="deadline" type="date" value={deadline} onChange={(e) => setDeadline(e.target.value)} className="mt-1.5" />
           </div>
           <Button type="submit" className="md:w-auto"><Plus className="size-4 mr-1" /> Adicionar</Button>
         </div>
