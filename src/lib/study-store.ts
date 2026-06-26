@@ -6,6 +6,8 @@ export type Topic = {
   title: string;
   notes?: string;
   done: boolean;
+  parentId?: string;
+  subtasks?: Topic[];
 };
 
 export type Subject = {
@@ -95,16 +97,28 @@ async function loadAll(userId: string) {
     supabase.from("study_sessions").select("*").eq("user_id", userId).order("started_at"),
   ]);
 
-  const topics = (topicsRes.data ?? []) as any[];
+  const rawTopics = (topicsRes.data ?? []) as any[];
+
+  function buildTopics(subjectId: string, parentId: string | null): Topic[] {
+    return rawTopics
+      .filter((t) => t.subject_id === subjectId && (t.parent_id ?? null) === parentId)
+      .map((t) => ({
+        id: t.id,
+        title: t.title,
+        notes: t.notes ?? undefined,
+        done: !!t.done,
+        parentId: t.parent_id ?? undefined,
+        subtasks: buildTopics(subjectId, t.id),
+      }));
+  }
+
   const subjects: Subject[] = (subjectsRes.data ?? []).map((s: any) => ({
     id: s.id,
     name: s.name,
     color: s.color,
     goalHours: s.weekly_hours_target ?? undefined,
     deadline: s.deadline ?? undefined,
-    topics: topics
-      .filter((t) => t.subject_id === s.id)
-      .map((t) => ({ id: t.id, title: t.title, notes: t.notes ?? undefined, done: !!t.done })),
+    topics: buildTopics(s.id, null),
   }));
 
   const schedule: ScheduleBlock[] = (scheduleRes.data ?? []).map((b: any) => {
@@ -257,20 +271,46 @@ export const studyActions = {
     }));
   },
 
-  async addTopic(subjectId: string, topic: Omit<Topic, "id" | "done">) {
+  async addTopic(subjectId: string, topic: Omit<Topic, "id" | "done" | "subtasks">) {
     const uid = requireUser();
     const { data, error } = await supabase
       .from("topics")
-      .insert({ user_id: uid, subject_id: subjectId, title: topic.title, notes: topic.notes ?? null, done: false })
+      .insert({
+        user_id: uid,
+        subject_id: subjectId,
+        title: topic.title,
+        notes: topic.notes ?? null,
+        done: false,
+        parent_id: topic.parentId ?? null,
+      })
       .select()
       .single();
     if (error || !data) return;
-    const newTopic: Topic = { id: data.id, title: data.title, notes: data.notes ?? undefined, done: !!data.done };
+    const newTopic: Topic = {
+      id: data.id,
+      title: data.title,
+      notes: data.notes ?? undefined,
+      done: !!data.done,
+      parentId: data.parent_id ?? undefined,
+      subtasks: [],
+    };
     setState((s) => ({
       ...s,
-      subjects: s.subjects.map((x) =>
-        x.id === subjectId ? { ...x, topics: [...(x.topics ?? []), newTopic] } : x,
-      ),
+      subjects: s.subjects.map((x) => {
+        if (x.id !== subjectId) return x;
+        if (!newTopic.parentId) {
+          return { ...x, topics: [...(x.topics ?? []), newTopic] };
+        }
+        // Add as subtask to parent
+        function addSubtask(topics: Topic[]): Topic[] {
+          return topics.map((t) =>
+            t.id === newTopic.parentId
+              ? { ...t, subtasks: [...(t.subtasks ?? []), newTopic] }
+              : { ...t, subtasks: addSubtask(t.subtasks ?? []) },
+          );
+        }
+        return { ...x, topics: addSubtask(x.topics ?? []) };
+      }),
     }));
   },
 
@@ -280,29 +320,46 @@ export const studyActions = {
     if (patch.notes !== undefined) dbPatch.notes = patch.notes;
     if (patch.done !== undefined) dbPatch.done = patch.done;
     await supabase.from("topics").update(dbPatch).eq("id", topicId);
+    function applyPatch(topics: Topic[]): Topic[] {
+      return topics.map((t) =>
+        t.id === topicId
+          ? { ...t, ...patch }
+          : { ...t, subtasks: applyPatch(t.subtasks ?? []) },
+      );
+    }
     setState((s) => ({
       ...s,
       subjects: s.subjects.map((x) =>
-        x.id === subjectId
-          ? { ...x, topics: (x.topics ?? []).map((t) => (t.id === topicId ? { ...t, ...patch } : t)) }
-          : x,
+        x.id === subjectId ? { ...x, topics: applyPatch(x.topics ?? []) } : x,
       ),
     }));
   },
 
   async toggleTopic(subjectId: string, topicId: string) {
+    function findTopic(topics: Topic[]): Topic | undefined {
+      for (const t of topics) {
+        if (t.id === topicId) return t;
+        const found = findTopic(t.subtasks ?? []);
+        if (found) return found;
+      }
+    }
     const subj = state.subjects.find((s) => s.id === subjectId);
-    const t = subj?.topics?.find((x) => x.id === topicId);
+    const t = findTopic(subj?.topics ?? []);
     if (!t) return;
     await studyActions.updateTopic(subjectId, topicId, { done: !t.done });
   },
 
   async removeTopic(subjectId: string, topicId: string) {
     await supabase.from("topics").delete().eq("id", topicId);
+    function filterOut(topics: Topic[]): Topic[] {
+      return topics
+        .filter((t) => t.id !== topicId)
+        .map((t) => ({ ...t, subtasks: filterOut(t.subtasks ?? []) }));
+    }
     setState((s) => ({
       ...s,
       subjects: s.subjects.map((x) =>
-        x.id === subjectId ? { ...x, topics: (x.topics ?? []).filter((t) => t.id !== topicId) } : x,
+        x.id === subjectId ? { ...x, topics: filterOut(x.topics ?? []) } : x,
       ),
     }));
   },
