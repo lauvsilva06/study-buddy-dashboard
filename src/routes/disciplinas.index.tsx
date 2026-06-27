@@ -5,14 +5,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useStudyStore, useHydrated, studyActions } from "@/lib/study-store";
-import { Trash2, Plus, Pipette } from "lucide-react";
+import { Trash2, Plus } from "lucide-react";
 
 export const Route = createFileRoute("/disciplinas/")({
   head: () => ({ meta: [{ title: "Disciplinas" }, { name: "description", content: "Gerencie suas disciplinas." }] }),
   component: SubjectsPage,
 });
 
-const PALETTE = ["#0ea5e9", "#22c55e", "#ef4444", "#f97316", "#a855f7", "#ec4899", "#f59e0b", "#3d5a80"];
+const PALETTE = ["#93c5fd", "#86efac", "#fca5a5", "#fdba74", "#d8b4fe", "#f9a8d4", "#fde68a", "#a5f3fc"];
 
 function SubjectsPage() {
   const subjects = useStudyStore((s) => s.subjects);
@@ -21,19 +21,6 @@ function SubjectsPage() {
   const [color, setColor] = useState(PALETTE[0]);
   const [goal, setGoal] = useState("");
   const [deadline, setDeadline] = useState("");
-  const [customColor, setCustomColor] = useState("#0ea5e9");
-  const [useCustom, setUseCustom] = useState(false);
-
-  function handleCustomColorChange(e: React.ChangeEvent<HTMLInputElement>) {
-    setCustomColor(e.target.value);
-    setColor(e.target.value);
-    setUseCustom(true);
-  }
-
-  function handlePaletteSelect(c: string) {
-    setColor(c);
-    setUseCustom(false);
-  }
 
   function add(e: React.FormEvent) {
     e.preventDefault();
@@ -57,11 +44,7 @@ function SubjectsPage() {
             <div key={s.id} className="rounded-2xl border border-border bg-card p-5 shadow-sm relative overflow-hidden group">
               <div className="absolute inset-x-0 top-0 h-1.5" style={{ background: s.color }} />
               <div className="flex items-start justify-between gap-2">
-                <Link
-                  to="/disciplinas/$id"
-                  params={{ id: s.id }}
-                  className="flex-1 min-w-0"
-                >
+                <Link to="/disciplinas/$id" params={{ id: s.id }} className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="size-3 rounded-full shrink-0" style={{ background: s.color }} />
                     <h4 className="font-display text-xl hover:underline underline-offset-4">{s.name}</h4>
@@ -115,30 +98,17 @@ function SubjectsPage() {
           <Button type="submit" className="md:w-auto"><Plus className="size-4 mr-1" /> Adicionar</Button>
         </div>
 
-        {/* Color picker */}
         <div className="mt-5">
-          <div className="flex items-center justify-between mb-3">
-            <Label className="block">Cor da disciplina</Label>
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">Cor selecionada:</span>
-              <span
-                className="inline-flex items-center gap-1.5 text-xs font-mono px-2 py-0.5 rounded-full text-white"
-                style={{ background: color }}
-              >
-                {color}
-              </span>
-            </div>
-          </div>
-
+          <Label className="block mb-3">Cor da disciplina</Label>
           <div className="flex flex-wrap gap-2">
             {PALETTE.map((c) => (
               <button
                 key={c}
                 type="button"
-                onClick={() => handlePaletteSelect(c)}
+                onClick={() => setColor(c)}
                 title={c}
                 className={`size-8 rounded-full border-2 transition-all hover:scale-110 ${
-                  color === c && !useCustom
+                  color === c
                     ? "border-foreground scale-110 ring-2 ring-offset-1 ring-foreground/30"
                     : "border-transparent"
                 }`}
@@ -147,42 +117,8 @@ function SubjectsPage() {
               />
             ))}
           </div>
-
-          {/* Custom color input */}
-          <div className="mt-4 flex items-center gap-3">
-            <Pipette className="size-4 text-muted-foreground shrink-0" />
-            <Label htmlFor="customColor" className="text-sm text-muted-foreground whitespace-nowrap">
-              Cor personalizada:
-            </Label>
-            <div className="flex items-center gap-2">
-              <input
-                id="customColor"
-                type="color"
-                value={customColor}
-                onChange={handleCustomColorChange}
-                className={`size-8 rounded-full cursor-pointer border-2 transition-all hover:scale-110 ${
-                  useCustom ? "border-foreground ring-2 ring-offset-1 ring-foreground/30" : "border-border"
-                }`}
-                style={{ padding: "1px", background: "transparent" }}
-              />
-              <Input
-                value={customColor}
-                onChange={(e) => {
-                  const val = e.target.value;
-                  setCustomColor(val);
-                  if (/^#[0-9a-fA-F]{6}$/.test(val)) {
-                    setColor(val);
-                    setUseCustom(true);
-                  }
-                }}
-                placeholder="#000000"
-                className="w-28 font-mono text-sm"
-              />
-            </div>
-          </div>
         </div>
       </form>
-
     </AppShell>
   );
 }
