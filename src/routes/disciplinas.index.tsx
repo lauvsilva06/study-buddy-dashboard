@@ -18,7 +18,7 @@ function SubjectsPage() {
   const subjects = useStudyStore((s) => s.subjects);
   const hydrated = useHydrated();
   const [name, setName] = useState("");
-  const [color, setColor] = useState(PALETTE[0].colors[0]);
+  const [color, setColor] = useState(PALETTE[0]);
   const [goal, setGoal] = useState("");
   const [deadline, setDeadline] = useState("");
   const [customColor, setCustomColor] = useState("#0ea5e9");
