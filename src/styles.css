@@ -1,6 +1,4 @@
 @import "tailwindcss" source(none);
-@import "@fontsource-variable/space-grotesk";
-@import "@fontsource-variable/dm-sans";
 @source "../src";
 @import "tw-animate-css";
 
@@ -41,73 +39,106 @@
   --color-sidebar-accent: var(--sidebar-accent);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
-  --font-display: "Space Grotesk Variable", system-ui, sans-serif;
-  --font-sans: "DM Sans Variable", system-ui, sans-serif;
+  --font-display: "Sora", system-ui, sans-serif;
+  --font-sans: "Manrope", system-ui, sans-serif;
 }
 
+/* ─── Light mode ─────────────────────────────────────────────────────────── */
 :root {
   --radius: 0.875rem;
-  --background: oklch(0.95 0.02 170);
-  --foreground: oklch(0.20 0.10 200);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.20 0.10 200);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.20 0.10 200);
-  --primary: oklch(0.35 0.20 170);
-  --primary-foreground: oklch(0.95 0.02 170);
-  --primary-glow: oklch(0.55 0.30 170);
-  --secondary: oklch(0.92 0.03 170);
-  --secondary-foreground: oklch(0.20 0.10 200);
-  --muted: oklch(0.88 0.02 170);
-  --muted-foreground: oklch(0.55 0.06 170);
-  --accent: oklch(0.88 0.03 170);
-  --accent-foreground: oklch(0.20 0.10 200);
-  --destructive: oklch(0.53 0.91 0);
-  --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.62 0.17 145);
-  --success-foreground: oklch(0.15 0.05 145);
-  --warning: oklch(0.76 0.44 45);
-  --warning-foreground: oklch(0.20 0.10 200);
-  --border: oklch(0.35 0.20 170 / 0.15);
-  --input: oklch(0.35 0.20 170 / 0.12);
-  --ring: oklch(0.35 0.20 170);
-  --sidebar: oklch(0.93 0.02 170);
-  --sidebar-foreground: oklch(0.20 0.10 200);
-  --sidebar-accent: oklch(0.88 0.03 170);
-  --sidebar-accent-foreground: oklch(0.20 0.10 200);
-  --sidebar-border: oklch(0.35 0.20 170 / 0.15);
+
+  /* Surfaces — fundo levemente azulado, cards brancos puros para flutuar */
+  --background:        #eef2f5;
+  --foreground:        #0a1628;
+  --card:              #ffffff;
+  --card-foreground:   #0a1628;
+  --popover:           #ffffff;
+  --popover-foreground:#0a1628;
+
+  /* Primary — verde-neon/menta: apenas CTAs e progresso */
+  --primary:           #00c896;
+  --primary-foreground:#001a14;
+  --primary-glow:      #00e8ad;
+
+  /* Secondary — azul-escuro suave para elementos de apoio */
+  --secondary:         #d4dde8;
+  --secondary-foreground: #0a1628;
+
+  /* Muted — cinza-azulado frio */
+  --muted:             #dce4ee;
+  --muted-foreground:  #4a6070;
+
+  /* Accent — verde-médio para hover states e destaques secundários */
+  --accent:            #e0f5ef;
+  --accent-foreground: #00664d;
+
+  /* Semânticas */
+  --destructive:       #e05252;
+  --destructive-foreground: #ffffff;
+  --success:           #2db87a;   /* verde-médio — diferente do primary neon */
+  --success-foreground:#ffffff;
+  --warning:           #e8a020;
+  --warning-foreground:#1a0e00;
+
+  /* Bordas e inputs */
+  --border:            #c8d6e0;
+  --input:             #dce4ee;
+  --ring:              #00c896;
+
+  /* Sidebar — tom azul-escuro da paleta para separar do conteúdo */
+  --sidebar:           #0d2137;
+  --sidebar-foreground:#c8dce8;
+  --sidebar-accent:    #1a3550;
+  --sidebar-accent-foreground: #e0f5ef;
+  --sidebar-border:    rgba(255,255,255,0.07);
 }
 
+/* ─── Dark mode ──────────────────────────────────────────────────────────── */
 .dark {
-  --background: oklch(0.21 0.11 197);
-  --foreground: oklch(0.98 0.02 126);
-  --card: oklch(0.23 0.11 198);
-  --card-foreground: oklch(0.98 0.02 126);
-  --popover: oklch(0.23 0.11 198);
-  --popover-foreground: oklch(0.98 0.02 126);
-  --primary: oklch(0.80 0.57 172);
-  --primary-foreground: oklch(0.15 0.08 200);
-  --primary-glow: oklch(0.94 0.52 167);
-  --secondary: oklch(0.36 0.19 169);
-  --secondary-foreground: oklch(0.98 0.02 126);
-  --muted: oklch(0.33 0.19 189);
-  --muted-foreground: oklch(0.64 0.09 168);
-  --accent: oklch(0.36 0.19 169);
-  --accent-foreground: oklch(0.98 0.02 126);
-  --destructive: oklch(0.53 0.91 0);
-  --destructive-foreground: oklch(1 0 0);
-  --success: oklch(0.62 0.17 145);
-  --success-foreground: oklch(0.15 0.05 145);
-  --warning: oklch(0.76 0.44 45);
-  --warning-foreground: oklch(0.98 0.02 126);
-  --border: oklch(0.80 0.57 172 / 0.15);
-  --input: oklch(0.80 0.57 172 / 0.12);
-  --ring: oklch(0.80 0.57 172);
-  --sidebar: oklch(0.19 0.10 200);
-  --sidebar-foreground: oklch(0.98 0.02 126);
-  --sidebar-accent: oklch(0.36 0.19 169);
-  --sidebar-accent-foreground: oklch(0.98 0.02 126);
-  --sidebar-border: oklch(0.80 0.57 172 / 0.15);
+  /* Surfaces — azul muito escuro como fundo, cards um tom acima */
+  --background:        #050f1a;
+  --foreground:        #d4eaf5;
+  --card:              #0d1f30;
+  --card-foreground:   #d4eaf5;
+  --popover:           #0d1f30;
+  --popover-foreground:#d4eaf5;
+
+  /* Primary — verde-neon mantém força no escuro */
+  --primary:           #00c896;
+  --primary-foreground:#001a14;
+  --primary-glow:      #00e8ad;
+
+  /* Secondary — azul-marinho médio */
+  --secondary:         #122840;
+  --secondary-foreground: #d4eaf5;
+
+  /* Muted — mais escuro que o card, mas legível */
+  --muted:             #0a1a28;
+  --muted-foreground:  #6a96b0;
+
+  /* Accent — verde-escuro da paleta */
+  --accent:            #0d3326;
+  --accent-foreground: #00c896;
+
+  /* Semânticas */
+  --destructive:       #f06060;
+  --destructive-foreground: #ffffff;
+  --success:           #2db87a;   /* verde-médio — distinto do primary */
+  --success-foreground:#001a14;
+  --warning:           #f0a830;
+  --warning-foreground:#1a0e00;
+
+  /* Bordas e inputs */
+  --border:            rgba(0, 200, 150, 0.10);
+  --input:             rgba(255, 255, 255, 0.06);
+  --ring:              #00c896;
+
+  /* Sidebar — tom mais escuro que o background, azul-marinho profundo */
+  --sidebar:           #030c16;
+  --sidebar-foreground:#7aafc4;
+  --sidebar-accent:    #0d1f30;
+  --sidebar-accent-foreground: #00c896;
+  --sidebar-border:    rgba(0, 200, 150, 0.08);
 }
 
 @layer base {
