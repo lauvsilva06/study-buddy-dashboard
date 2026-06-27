@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { AppShell } from "@/components/AppShell";
 import { useStudyStore, useHydrated } from "@/lib/study-store";
-import { ArrowRight, BookOpen, CalendarDays, Timer } from "lucide-react";
+import { ArrowRight, BookOpen, CalendarDays, Timer, AlertCircle } from "lucide-react";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -26,6 +26,17 @@ function Dashboard() {
   const totalSecondsAll = sessions.filter((s) => s.mode === "focus").reduce((a, b) => a + b.durationSeconds, 0);
   const todayBlocks = schedule.filter((b) => b.day === todayDay);
 
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const deadlines = subjects
+    .filter((s) => s.deadline)
+    .map((s) => {
+      const d = new Date(s.deadline! + "T00:00:00");
+      const days = Math.round((d.getTime() - today.getTime()) / 86400000);
+      return { subject: s, date: d, days };
+    })
+    .sort((a, b) => a.date.getTime() - b.date.getTime());
+
   return (
     <AppShell title="Bom estudo!" subtitle="Resumo do seu dia e atalhos rápidos.">
       <div className="grid gap-4 md:grid-cols-3 mb-10">
@@ -42,7 +53,7 @@ function Dashboard() {
         />
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid md:grid-cols-2 gap-4 mb-4">
         <Card title="Próximas atividades de hoje" to="/cronograma" linkLabel="Ver cronograma">
           {hydrated && todayBlocks.length === 0 ? (
             <p className="text-sm text-muted-foreground">Nada agendado para hoje.</p>
@@ -76,6 +87,97 @@ function Dashboard() {
             </ul>
           )}
         </Card>
+      </div>
+
+      {/* Deadlines calendar */}
+      <div className="rounded-2xl border border-border bg-card p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-5">
+          <h3 className="font-display text-lg flex items-center gap-2">
+            <CalendarDays className="size-5 text-primary" /> Calendário de prazos
+          </h3>
+          <Link to="/disciplinas" className="text-xs text-primary inline-flex items-center gap-1 hover:underline">
+            Gerenciar <ArrowRight className="size-3" />
+          </Link>
+        </div>
+
+        {!hydrated ? (
+          <p className="text-sm text-muted-foreground">Carregando…</p>
+        ) : deadlines.length === 0 ? (
+          <div className="text-center py-8 border border-dashed border-border rounded-xl">
+            <CalendarDays className="size-6 mx-auto mb-2 text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">
+              Nenhuma disciplina com prazo definido.
+            </p>
+          </div>
+        ) : (
+          <ul className="divide-y divide-border">
+            {deadlines.map(({ subject, date, days }) => {
+              const overdue = days < 0;
+              const soon = days >= 0 && days <= 7;
+              const tone = overdue
+                ? "text-destructive"
+                : soon
+                  ? "text-primary"
+                  : "text-muted-foreground";
+              const label = overdue
+                ? `Vencido há ${Math.abs(days)}d`
+                : days === 0
+                  ? "Vence hoje"
+                  : `Faltam ${days}d`;
+              const monthShort = date
+                .toLocaleDateString("pt-BR", { month: "short" })
+                .replace(".", "")
+                .toUpperCase();
+              return (
+                <li key={subject.id}>
+                  <Link
+                    to="/disciplinas/$id"
+                    params={{ id: subject.id }}
+                    className="flex items-center gap-4 py-3 group"
+                  >
+                    <div
+                      className="flex flex-col items-center justify-center w-14 h-14 rounded-xl border border-border bg-background/60 flex-shrink-0"
+                      style={{ borderColor: `${subject.color}55` }}
+                    >
+                      <span
+                        className="text-[10px] font-semibold tracking-wider"
+                        style={{ color: subject.color }}
+                      >
+                        {monthShort}
+                      </span>
+                      <span className="font-display text-xl leading-none tabular-nums">
+                        {date.getDate()}
+                      </span>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="size-2 rounded-full flex-shrink-0"
+                          style={{ background: subject.color }}
+                        />
+                        <span className="font-medium text-sm group-hover:underline underline-offset-4 truncate">
+                          {subject.name}
+                        </span>
+                      </div>
+                      <p className="text-xs text-muted-foreground mt-0.5">
+                        {date.toLocaleDateString("pt-BR", {
+                          weekday: "long",
+                          day: "2-digit",
+                          month: "long",
+                          year: "numeric",
+                        })}
+                      </p>
+                    </div>
+                    <div className={`text-xs font-medium flex items-center gap-1 ${tone}`}>
+                      {overdue && <AlertCircle className="size-3.5" />}
+                      {label}
+                    </div>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        )}
       </div>
     </AppShell>
   );
