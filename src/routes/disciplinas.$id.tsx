@@ -79,7 +79,7 @@ function TopicRow({
   accent: string;
   depth?: number;
 }) {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(false);
   const [addingSubtask, setAddingSubtask] = useState(false);
   const subs = topic.subtasks ?? [];
   const hasSubtasks = subs.length > 0;
