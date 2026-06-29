@@ -35,12 +35,23 @@ export type StudySession = {
   mode: "focus" | "break";
 };
 
+export type Activity = {
+  id: string;
+  subjectId?: string;
+  title: string;
+  description?: string;
+  dueDate: string; // YYYY-MM-DD
+  dueTime?: string; // HH:MM
+  done: boolean;
+};
+
 type Store = {
   loaded: boolean;
   userId: string | null;
   subjects: Subject[];
   schedule: ScheduleBlock[];
   sessions: StudySession[];
+  activities: Activity[];
 };
 
 const emptyStore: Store = {
@@ -49,6 +60,7 @@ const emptyStore: Store = {
   subjects: [],
   schedule: [],
   sessions: [],
+  activities: [],
 };
 
 let state: Store = emptyStore;
