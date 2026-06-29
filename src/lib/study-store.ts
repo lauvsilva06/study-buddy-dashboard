@@ -386,6 +386,65 @@ export const studyActions = {
       ),
     }));
   },
+
+  async addActivity(activity: Omit<Activity, "id" | "done">) {
+    const uid = requireUser();
+    const { data, error } = await supabase
+      .from("activities")
+      .insert({
+        user_id: uid,
+        subject_id: activity.subjectId ?? null,
+        title: activity.title,
+        description: activity.description ?? null,
+        due_date: activity.dueDate,
+        due_time: activity.dueTime ?? null,
+        done: false,
+      })
+      .select()
+      .single();
+    if (error || !data) return;
+    setState((s) => ({
+      ...s,
+      activities: [
+        ...s.activities,
+        {
+          id: data.id,
+          subjectId: data.subject_id ?? undefined,
+          title: data.title,
+          description: data.description ?? undefined,
+          dueDate: data.due_date,
+          dueTime: data.due_time ?? undefined,
+          done: !!data.done,
+        },
+      ],
+    }));
+  },
+
+  async updateActivity(id: string, patch: Partial<Activity>) {
+    const dbPatch: any = {};
+    if (patch.subjectId !== undefined) dbPatch.subject_id = patch.subjectId ?? null;
+    if (patch.title !== undefined) dbPatch.title = patch.title;
+    if (patch.description !== undefined) dbPatch.description = patch.description ?? null;
+    if (patch.dueDate !== undefined) dbPatch.due_date = patch.dueDate;
+    if (patch.dueTime !== undefined) dbPatch.due_time = patch.dueTime ?? null;
+    if (patch.done !== undefined) dbPatch.done = patch.done;
+    await supabase.from("activities").update(dbPatch).eq("id", id);
+    setState((s) => ({
+      ...s,
+      activities: s.activities.map((a) => (a.id === id ? { ...a, ...patch } : a)),
+    }));
+  },
+
+  async toggleActivity(id: string) {
+    const a = state.activities.find((x) => x.id === id);
+    if (!a) return;
+    await studyActions.updateActivity(id, { done: !a.done });
+  },
+
+  async removeActivity(id: string) {
+    await supabase.from("activities").delete().eq("id", id);
+    setState((s) => ({ ...s, activities: s.activities.filter((a) => a.id !== id) }));
+  },
 };
 
 export const DAYS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
