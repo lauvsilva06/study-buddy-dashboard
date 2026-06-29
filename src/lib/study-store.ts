@@ -102,11 +102,12 @@ function parseHHMM(s: string) {
 
 // ---------- Loading ----------
 async function loadAll(userId: string) {
-  const [subjectsRes, topicsRes, scheduleRes, sessionsRes] = await Promise.all([
+  const [subjectsRes, topicsRes, scheduleRes, sessionsRes, activitiesRes] = await Promise.all([
     supabase.from("subjects").select("*").eq("user_id", userId).order("created_at"),
     supabase.from("topics").select("*").eq("user_id", userId).order("created_at"),
     supabase.from("schedule_items").select("*").eq("user_id", userId).order("created_at"),
     supabase.from("study_sessions").select("*").eq("user_id", userId).order("started_at"),
+    supabase.from("activities").select("*").eq("user_id", userId).order("due_date"),
   ]);
 
   const rawTopics = (topicsRes.data ?? []) as any[];
