@@ -154,7 +154,17 @@ async function loadAll(userId: string) {
     mode: "focus" as const,
   }));
 
-  state = { loaded: true, userId, subjects, schedule, sessions };
+  const activities: Activity[] = (activitiesRes.data ?? []).map((a: any) => ({
+    id: a.id,
+    subjectId: a.subject_id ?? undefined,
+    title: a.title,
+    description: a.description ?? undefined,
+    dueDate: a.due_date,
+    dueTime: a.due_time ?? undefined,
+    done: !!a.done,
+  }));
+
+  state = { loaded: true, userId, subjects, schedule, sessions, activities };
   emit();
 }
 
