@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { BookOpen, CalendarDays, Timer, LayoutDashboard, LogOut } from "lucide-react";
+import { BookOpen, CalendarDays, Timer, LayoutDashboard, LogOut, ClipboardList } from "lucide-react";
 import { useEffect, useState, type ReactNode } from "react";
 import { cn } from "@/lib/utils";
 import { supabase } from "@/lib/supabase";
@@ -9,6 +9,7 @@ const nav = [
   { to: "/", label: "Visão geral", icon: LayoutDashboard },
   { to: "/disciplinas", label: "Disciplinas", icon: BookOpen },
   { to: "/cronograma", label: "Cronograma", icon: CalendarDays },
+  { to: "/atividades", label: "Atividades", icon: ClipboardList },
   { to: "/metricas", label: "Métricas & Pomodoro", icon: Timer },
 ] as const;
 
