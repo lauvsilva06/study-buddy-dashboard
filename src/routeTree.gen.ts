@@ -13,6 +13,7 @@ import { Route as MetricasRouteImport } from './routes/metricas'
 import { Route as DisciplinasRouteImport } from './routes/disciplinas'
 import { Route as CronogramaRouteImport } from './routes/cronograma'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AtividadesRouteImport } from './routes/atividades'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DisciplinasIndexRouteImport } from './routes/disciplinas.index'
 import { Route as DisciplinasIdRouteImport } from './routes/disciplinas.$id'
@@ -37,6 +38,11 @@ const AuthRoute = AuthRouteImport.update({
   path: '/auth',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AtividadesRoute = AtividadesRouteImport.update({
+  id: '/atividades',
+  path: '/atividades',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -55,6 +61,7 @@ const DisciplinasIdRoute = DisciplinasIdRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/atividades': typeof AtividadesRoute
   '/auth': typeof AuthRoute
   '/cronograma': typeof CronogramaRoute
   '/disciplinas': typeof DisciplinasRouteWithChildren
@@ -64,6 +71,7 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/atividades': typeof AtividadesRoute
   '/auth': typeof AuthRoute
   '/cronograma': typeof CronogramaRoute
   '/metricas': typeof MetricasRoute
@@ -73,6 +81,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/atividades': typeof AtividadesRoute
   '/auth': typeof AuthRoute
   '/cronograma': typeof CronogramaRoute
   '/disciplinas': typeof DisciplinasRouteWithChildren
@@ -84,6 +93,7 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/atividades'
     | '/auth'
     | '/cronograma'
     | '/disciplinas'
@@ -93,6 +103,7 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/atividades'
     | '/auth'
     | '/cronograma'
     | '/metricas'
@@ -101,6 +112,7 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
+    | '/atividades'
     | '/auth'
     | '/cronograma'
     | '/disciplinas'
@@ -111,6 +123,7 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AtividadesRoute: typeof AtividadesRoute
   AuthRoute: typeof AuthRoute
   CronogramaRoute: typeof CronogramaRoute
   DisciplinasRoute: typeof DisciplinasRouteWithChildren
@@ -145,6 +158,13 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/atividades': {
+      id: '/atividades'
+      path: '/atividades'
+      fullPath: '/atividades'
+      preLoaderRoute: typeof AtividadesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -187,6 +207,7 @@ const DisciplinasRouteWithChildren = DisciplinasRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AtividadesRoute: AtividadesRoute,
   AuthRoute: AuthRoute,
   CronogramaRoute: CronogramaRoute,
   DisciplinasRoute: DisciplinasRouteWithChildren,
