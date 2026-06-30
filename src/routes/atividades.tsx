@@ -82,12 +82,12 @@ function Atividades() {
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="subject">Disciplina</Label>
-            <Select value={subjectId} onValueChange={setSubjectId}>
+            <Select value={subjectId || "none"} onValueChange={(v) => setSubjectId(v === "none" ? "" : v)}>
               <SelectTrigger id="subject" className="w-full">
                 <SelectValue placeholder="— Sem disciplina —" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="">— Sem disciplina —</SelectItem>
+                <SelectItem value="none">— Sem disciplina —</SelectItem>
                 {subjects.map((s) => (
                   <SelectItem key={s.id} value={s.id}>
                     <span className="flex items-center gap-2">
