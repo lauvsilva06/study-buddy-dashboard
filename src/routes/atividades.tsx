@@ -82,19 +82,22 @@ function Atividades() {
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="subject">Disciplina</Label>
-            <select
-              id="subject"
-              value={subjectId}
-              onChange={(e) => setSubjectId(e.target.value)}
-              className="h-9 rounded-md border border-input bg-transparent px-3 text-sm"
-            >
-              <option value="">— Sem disciplina —</option>
-              {subjects.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.name}
-                </option>
-              ))}
-            </select>
+            <Select value={subjectId} onValueChange={setSubjectId}>
+              <SelectTrigger id="subject" className="w-full">
+                <SelectValue placeholder="— Sem disciplina —" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">— Sem disciplina —</SelectItem>
+                {subjects.map((s) => (
+                  <SelectItem key={s.id} value={s.id}>
+                    <span className="flex items-center gap-2">
+                      <span className="size-2 rounded-full" style={{ background: s.color }} />
+                      {s.name}
+                    </span>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid gap-1.5">
             <Label htmlFor="date">Prazo</Label>
