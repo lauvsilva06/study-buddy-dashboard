@@ -4,6 +4,13 @@ import { AppShell } from "@/components/AppShell";
 import { useStudyStore, useHydrated, studyActions } from "@/lib/study-store";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { CalendarDays, Plus, Trash2, AlertCircle, CheckCircle2, Circle } from "lucide-react";
 
 export const Route = createFileRoute("/atividades")({
